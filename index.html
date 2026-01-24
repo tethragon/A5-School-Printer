@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+    <meta charset="UTF-8">
+    <title>PDF 2-in-1 Landscape Converter v.2</title>
+    <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
+        #drop-zone { border: 2px dashed #4a90e2; border-radius: 20px; width: 400px; height: 200px; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; background: #252525; }
+        #drop-zone.hover { background: #353535; border-color: #00ffcc; }
+        .info { margin-top: 20px; text-align: center; color: #aaa; }
+        #status { margin-top: 10px; color: #00ffcc; font-weight: bold; }
+    </style>
+</head>
+<body>
+
+    <h2>PDF 2-in-1 Converter</h2>
+    <div id="drop-zone">Σύρε το PDF εδώ ή κάνε κλικ</div>
+    <input type="file" id="file-input" accept="application/pdf" style="display:none">
+    
+    <div class="info">
+        Μετατρέπει 2 σελίδες A4 Portrait σε 1 A4 Landscape<br>
+        Προσθέτει διαχωριστική γραμμή & ονομάζει αυτόματα το αρχείο.
+    </div>
+    <div id="status"></div>
+
+    <script>
+        const dropZone = document.getElementById('drop-zone');
+        const fileInput = document.getElementById('file-input');
+        const status = document.getElementById('status');
+
+        dropZone.onclick = () => fileInput.click();
+
+        dropZone.ondragover = (e) => { e.preventDefault(); dropZone.classList.add('hover'); };
+        dropZone.ondragleave = () => dropZone.classList.remove('hover');
+        dropZone.ondrop = (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('hover');
+            if (e.dataTransfer.files.length) processPDF(e.dataTransfer.files[0]);
+        };
+
+        fileInput.onchange = (e) => {
+            if (e.target.files.length) processPDF(e.target.files[0]);
+        };
+
+        async function processPDF(file) {
+            status.innerText = "Επεξεργασία...";
+            const arrayBuffer = await file.arrayBuffer();
+            const srcPdf = await PDFLib.PDFDocument.load(arrayBuffer);
+            const pageCount = srcPdf.getPageCount();
+
+            // Συναρτήση για δημιουργία PDF από λίστα σελίδων
+            async function createPdfFromIndices(indices, suffix) {
+                const outPdf = await PDFLib.PDFDocument.create();
+                for (const group of indices) {
+                    const newPage = outPdf.addPage([841.89, 595.28]); // A4 Landscape
+                    const { width, height } = newPage.getSize();
+                    
+                    const [p1] = await outPdf.embedPages([srcPdf.getPages()[group[0]]]);
+                    const [p2] = await outPdf.embedPages([srcPdf.getPages()[group[1]]]);
+
+                    newPage.drawPage(p1, { x: 0, y: 0, width: width / 2, height: height });
+                    newPage.drawPage(p2, { x: width / 2, y: 0, width: width / 2, height: height });
+
+                    // Διακεκομμένη γραμμή κοπής
+                    newPage.drawLine({
+                        start: { x: width / 2, y: 0 },
+                        end: { x: width / 2, y: height },
+                        thickness: 1,
+                        dashArray: [5, 5],
+                        color: PDFLib.rgb(0.7, 0.7, 0.7),
+                    });
+                }
+                const pdfBytes = await outPdf.save();
+                const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                const link = document.createElement("a");
+                link.href = URL.createObjectURL(blob);
+                link.download = file.name.replace(".pdf", "") + suffix + ".pdf";
+                link.click();
+            }
+
+            if (pageCount === 1) {
+                // Περίπτωση 1 σελίδας -> 1 αρχείο με τη σελίδα διπλή
+                await createPdfFromIndices([[0, 0]], "_2in1_landscape_SINGLE");
+            } else if (pageCount % 2 === 0) {
+                // Ζυγός αριθμός -> 1 αρχείο με όλα τα ζεύγη
+                let indices = [];
+                for (let i = 0; i < pageCount; i += 2) indices.push([i, i + 1]);
+                await createPdfFromIndices(indices, "_2in1_landscape_FULL");
+            } else {
+                // Περιττός αριθμός (>1) -> ΔΥΟ αρχεία
+                let mainIndices = [];
+                for (let i = 0; i < pageCount - 1; i += 2) mainIndices.push([i, i + 1]);
+                
+                // 1. Το κύριο αρχείο (σελίδες 1 έως προτελευταία)
+                await createPdfFromIndices(mainIndices, "_PART_A_FULL_PAGES");
+                
+                // 2. Το αρχείο της τελευταίας σελίδας (διπλή)
+                const lastIdx = pageCount - 1;
+                await createPdfFromIndices([[lastIdx, lastIdx]], "_PART_B_LAST_PAGE_DOUBLE");
+            }
+
+            status.innerText = "Η μετατροπή ολοκληρώθηκε!";
+        }
+    </script>
+</body>
+</html>

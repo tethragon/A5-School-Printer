@@ -19,7 +19,7 @@ An open-source, client-side web tool designed to help teachers reduce paper cons
         - **Part B:** The last page duplicated side-by-side (to save paper when printing for half the class).
 - **A5 Optimized:** Automatically scales and fits content into landscape halves.
 - **Cutting Guide:** Adds a dashed vertical line in the middle to guide the paper cutter (guillotine).
-- **Automatic Naming:** Files are saved with the suffix `_2in1_landscapew` for easy organization.
+- **Automatic Naming:** Files are saved with the suffix `_2in1_landscape` for easy organization.
 
 ---
 

@@ -1,63 +1,80 @@
 # 📄 PaperSaver-Edu-PDF
 
-**Optimized A4 to A5 PDF Converter for Teachers**
-
-An open-source, client-side web tool designed to help teachers reduce paper consumption. This tool converts standard A4 Portrait PDF documents into 2-in-1 A4 Landscape formats, perfectly sized to be cut in half and pasted into students' A5-sized notebooks.
-
-
+**Έξυπνος Μετατροπέας PDF 2-σε-1 (A4 Portrait σε A5 Landscape) για Εκπαιδευτικούς**  
+*Optimized A4 to A5 PDF Converter for Teachers & Schools*
 
 ---
 
-## ✨ Features
+## 📌 Στοιχεία Προγράμματος & Ταυτότητα
 
-- **Privacy First:** All processing happens locally in your browser. No files are uploaded to any server.
-- **Smart Imposition:**
-    - **Single Page:** Automatically duplicates the page side-by-side (2-in-1) so you get two copies per A4 sheet.
-    - **Even Pages:** Pairs pages normally (1-2, 3-4, etc.).
-    - **Odd Pages (>1):** Splits the output into two files:
-        - **Part A:** All complete pairs.
-        - **Part B:** The last page duplicated side-by-side (to save paper when printing for half the class).
-- **A5 Optimized:** Automatically scales and fits content into landscape halves.
-- **Cutting Guide:** Adds a dashed vertical line in the middle to guide the paper cutter (guillotine).
-- **Automatic Naming:** Files are saved with the suffix `_2in1_landscape` for easy organization.
+- **Έκδοση:** `v2.1.0`
+- **Program Architect:** George Petrakis
+- **Copyright:** © 2025 George Petrakis
+- **Άδεια Χρήσης:** [GNU General Public License v3.0 (GPLv3)](LICENSE)
 
 ---
 
-## 🛠️ How to Use
+## ✨ Περιγραφή & Χαρακτηριστικά
 
-1. **Open the Tool:** Open `index.html` (or the hosted GitHub Pages link) in any modern browser.
-2. **Drag & Drop:** Drag your A4 PDF file into the designated area.
-3. **Download:** - If the PDF has an even number of pages, one file will download.
-   - If it has an odd number of pages, **two** files will download automatically.
-4. **Print & Cut:**
-   - Print the files.
-   - Use the dashed line to cut the A4 sheets into two A5 flyers.
+Το **PaperSaver-Edu-PDF** είναι ένα αυτόνομο (client-side) εργαλείο σχεδιασμένο ειδικά για εκπαιδευτικούς, φροντιστήρια και σχολεία με στόχο τη δραστική μείωση της κατανάλωσης χαρτιού και του κόστους εκτύπωσης/φωτοτυπιών.
 
----
+Μετατρέπει τυπικά έγγραφα PDF μεγέθους A4 Portrait σε 2-σε-1 A4 Landscape, ιδανικά διαμορφωμένα ώστε με ένα κόψιμο στη μέση να παράγονται δύο αυτόνομα φυλλάδια A5 που επικολλώνται τέλεια στα τετράδια των μαθητών.
 
-## 💡 Economic Printing Strategy for Schools
-
-This tool follows the **"Teacher's Logic"**:
-- **Scenario:** You have a 3-page PDF and 20 students.
-- **Normal way:** You would print 20x3 = 60 sheets of A4.
-- **PaperSaver way:** - You get **Part A** (Pages 1 & 2). Print 20 copies.
-    - You get **Part B** (Page 3 duplicated). Print only **10** copies and cut them in half.
-- **Result:** You used **30** sheets instead of 60. **50% Paper Saving!**
-
----
-
-## 🚀 Technical Stack
-
-- **HTML5 / CSS3** (Modern Dark UI)
-- **JavaScript** (ES6+)
-- **[pdf-lib](https://pdf-lib.js.org/)** - For high-performance PDF manipulation without a backend.
+### Κύρια Πλεονεκτήματα:
+1. **100% Client-Side & Ιδιωτικότητα (Privacy First):**
+   - Καμία επεξεργασία δεν γίνεται σε εξωτερικό διακομιστή (server). Όλες οι μετατροπές εκτελούνται τοπικά στο πρόγραμμα περιήγησης (browser).
+2. **Έξυπνη Διάταξη Σελίδων (Smart Imposition - "Teacher's Logic"):**
+   - **Μονή Σελίδα (1 page):** Διπλασιάζεται αυτόματα δίπλα-δίπλα (2-σε-1) σε ένα φύλλο A4 Landscape (`_2in1_landscape_SINGLE.pdf`).
+   - **Ζυγός Αριθμός Σελίδων (2, 4, 6...):** Συνδυάζει κανονικά τα ζεύγη σελίδων (1-2, 3-4, κ.λπ.) σε ένα αρχείο (`_2in1_landscape_FULL.pdf`).
+   - **Περιττός Αριθμός Σελίδων (>1, π.χ. 3, 5...):** Χωρίζει έξυπνα την έξοδο σε **δύο** ξεχωριστά αρχεία:
+     - **Part A (`_PART_A_FULL_PAGES.pdf`):** Όλα τα πλήρη ζεύγη σελίδων (π.χ. σελίδες 1 & 2).
+     - **Part B (`_PART_B_LAST_PAGE_DOUBLE.pdf`):** Την τελευταία μονή σελίδα διπλασιασμένη δίπλα-δίπλα.
+3. **Οδηγός Κοπής (Cutting Guide):**
+   - Αυτόματη διακεκομμένη διακριτική γραμμή ακριβώς στο κέντρο για ακρίβεια στην γκιλοτίνα/κόπτη χαρτιού.
+4. **Standalone Λειτουργία:**
+   - Μπορεί να λειτουργήσει πλήρως αυτόνομα ως ενιαίο αρχείο `index.html` χωρίς καμία ανάγκη εγκατάστασης node ή server.
 
 ---
 
-## 📝 License
+## 💡 Οικονομική Στρατηγική Εκτύπωσης για Σχολεία
 
-This project is open-source and available under the [MIT License](LICENSE).
+**Παράδειγμα:** Έχετε ένα διαγώνισμα/φυλλάδιο 3 σελίδων και τμήμα 20 μαθητών.
+- **Κλασικός τρόπος εκτύπωσης:**  
+  20 μαθητές × 3 φύλλα A4 = **60 φύλλα A4**.
+- **Μεθοδολογία PaperSaver-Edu-PDF:**  
+  - Εκτυπώνετε **20 αντίτυπα** του **Part A** (Σελίδες 1 & 2).
+  - Εκτυπώνετε μόνο **10 αντίτυπα** του **Part B** (Σελίδα 3 διπλή). Κόβετε στη μέση και έχετε 20 φυλλάδια για τη σελίδα 3!
+- **Τελικό Αποτέλεσμα:** Χρησιμοποιήθηκαν μόνο **30 φύλλα A4** αντί για 60. **50% εξοικονόμηση χαρτιού & κόστους!**
 
 ---
 
-*Made with ☕ for teachers who want to save the planet, one photocopy at a time.*
+## 🛠️ Τρόπος Χρήσης
+
+1. Ανοίξτε το `index.html` σε οποιονδήποτε σύγχρονο περιηγητή (Chrome, Firefox, Safari, Edge).
+2. Σύρετε (drag & drop) ή επιλέξτε το αρχείο PDF A4.
+3. Το εργαλείο επεξεργάζεται ακαριαία το αρχείο και ξεκινά αυτόματα τη λήψη των βελτιστοποιημένων αρχείων.
+4. Εκτυπώστε και κόψτε στη διακεκομμένη γραμμή!
+
+---
+
+## 📜 Άδεια Χρήσης (License)
+
+Το παρόν λογισμικό διατίθεται υπό τους όρους της **GNU General Public License v3.0 (GPLv3)**.
+
+```
+PaperSaver-Edu-PDF
+Copyright (C) 2025 George Petrakis
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+GNU General Public License for more details.
+```
+
+---
+*Σχεδιασμένο με μεράκι για εκπαιδευτικούς που νοιάζονται για το περιβάλλον και την εξοικονόμηση πόρων στο σχολείο.*

@@ -1,20 +1,201 @@
+<!--
+/*
+ * Copyright (C) 2025 [GEORGE PETRAKIS]
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ */
+-->
 <!DOCTYPE html>
 <html lang="el">
 <head>
     <meta charset="UTF-8">
-    <title>PDF 2-in-1 Landscape Converter v.2</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PDF 2-in-1 Landscape Converter</title>
+    <meta name="description" content="PDF 2-in-1 Converter - Μετατροπέας A4 Portrait σε A5 Landscape για εκπαιδευτικούς από τον George Petrakis." />
+    <!-- pdf-lib standalone library -->
     <script src="https://unpkg.com/pdf-lib@1.17.1/dist/pdf-lib.min.js"></script>
     <style>
-        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background: #1a1a1a; color: white; display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100vh; margin: 0; }
-        #drop-zone { border: 2px dashed #4a90e2; border-radius: 20px; width: 400px; height: 200px; display: flex; align-items: center; justify-content: center; transition: 0.3s; cursor: pointer; background: #252525; }
-        #drop-zone.hover { background: #353535; border-color: #00ffcc; }
-        .info { margin-top: 20px; text-align: center; color: #aaa; }
-        #status { margin-top: 10px; color: #00ffcc; font-weight: bold; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: #1a1a1a;
+            color: white;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            position: relative;
+            box-sizing: border-box;
+        }
+
+        .header-title {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .header-title h2 {
+            margin: 0;
+            font-size: 24px;
+        }
+
+        /* Discrete 'i' button next to title */
+        #info-btn {
+            width: 22px;
+            height: 22px;
+            border-radius: 50%;
+            border: 1px solid #4a90e2;
+            background: #252525;
+            color: #4a90e2;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            font-size: 13px;
+            font-weight: bold;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.25s ease;
+            outline: none;
+            padding: 0;
+            line-height: 1;
+        }
+
+        #info-btn:hover {
+            border-color: #00ffcc;
+            color: #00ffcc;
+            background: #353535;
+            transform: scale(1.1);
+        }
+
+        #drop-zone {
+            border: 2px dashed #4a90e2;
+            border-radius: 20px;
+            width: 400px;
+            height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: 0.3s;
+            cursor: pointer;
+            background: #252525;
+            user-select: none;
+        }
+
+        #drop-zone.hover {
+            background: #353535;
+            border-color: #00ffcc;
+        }
+
+        .info {
+            margin-top: 20px;
+            text-align: center;
+            color: #aaa;
+            line-height: 1.5;
+            font-size: 14px;
+        }
+
+        #status {
+            margin-top: 10px;
+            color: #00ffcc;
+            font-weight: bold;
+            min-height: 24px;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.75);
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+        }
+
+        .modal-overlay.active {
+            display: flex;
+        }
+
+        .modal {
+            background: #252525;
+            border: 1px solid #4a90e2;
+            border-radius: 16px;
+            padding: 24px 28px;
+            max-width: 400px;
+            width: 90%;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
+            color: #eee;
+            font-size: 14px;
+            line-height: 1.6;
+            text-align: left;
+        }
+
+        .modal-close {
+            position: absolute;
+            top: 12px;
+            right: 14px;
+            background: none;
+            border: none;
+            color: #888;
+            font-size: 22px;
+            cursor: pointer;
+            line-height: 1;
+        }
+
+        .modal-close:hover {
+            color: #00ffcc;
+        }
+
+        .modal h3 {
+            margin-top: 0;
+            margin-bottom: 16px;
+            color: #00ffcc;
+            font-size: 18px;
+            border-bottom: 1px solid #353535;
+            padding-bottom: 8px;
+        }
+
+        .modal p {
+            margin: 8px 0;
+        }
+
+        .modal strong {
+            color: #4a90e2;
+        }
+
+        .modal a {
+            color: #00ffcc;
+            text-decoration: underline;
+            transition: color 0.2s;
+        }
+
+        .modal a:hover {
+            color: #4a90e2;
+        }
     </style>
 </head>
 <body>
 
-    <h2>PDF 2-in-1 Converter</h2>
+    <div class="header-title">
+        <h2>PDF 2-in-1 Converter</h2>
+        <button id="info-btn" title="Πληροφορίες" aria-label="Πληροφορίες">i</button>
+    </div>
+
     <div id="drop-zone">Σύρε το PDF εδώ ή κάνε κλικ</div>
     <input type="file" id="file-input" accept="application/pdf" style="display:none">
     
@@ -24,10 +205,57 @@
     </div>
     <div id="status"></div>
 
+    <!-- Modal Information -->
+    <div class="modal-overlay" id="modal-overlay">
+        <div class="modal">
+            <button class="modal-close" id="modal-close" aria-label="Κλείσιμο">&times;</button>
+            <h3>Πληροφορίες Εφαρμογής</h3>
+            <p><strong>Program Architect:</strong> George Petrakis</p>
+            <p><strong>Έκδοση:</strong> <span id="modal-version-val"></span></p>
+            <p><strong>Άδεια χρήσης:</strong> <a href="https://www.gnu.org/licenses/gpl-3.0.html" target="_blank" rel="noopener noreferrer">GNU General Public License v3 (GPLv3)</a></p>
+            <p><strong>Copyright:</strong> &copy; George Petrakis 2025</p>
+        </div>
+    </div>
+
     <script>
+    /*
+    * Copyright (C) 2025 [GEORGE PETRAKIS]
+    *
+    * This program is free software: you can redistribute it and/or modify
+    * it under the terms of the GNU General Public License as published by
+    * the Free Software Foundation, either version 3 of the License, or
+    * (at your option) any later version.
+    *
+    * This program is distributed in the hope that it will be useful,
+    * but WITHOUT ANY WARRANTY; without even the implied warranty of
+    * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+    * GNU General Public License for more details.
+    */
+        // =============================================================================
+        // 📌 ΕΚΔΟΣΗ ΠΡΟΓΡΑΜΜΑΤΟΣ (Αλλάξτε καρφωτά την έκδοση εδώ)
+        // =============================================================================
+        const APP_VERSION = 'v.2';
+        // =============================================================================
+
+        // Ενημέρωση τίτλου και modal με την έκδοση
+        document.title = "PDF 2-in-1 Landscape Converter " + APP_VERSION;
+        document.getElementById('modal-version-val').innerText = APP_VERSION;
+
         const dropZone = document.getElementById('drop-zone');
         const fileInput = document.getElementById('file-input');
         const status = document.getElementById('status');
+        const infoBtn = document.getElementById('info-btn');
+        const modalOverlay = document.getElementById('modal-overlay');
+        const modalClose = document.getElementById('modal-close');
+
+        infoBtn.onclick = () => modalOverlay.classList.add('active');
+        modalClose.onclick = () => modalOverlay.classList.remove('active');
+        modalOverlay.onclick = (e) => {
+            if (e.target === modalOverlay) modalOverlay.classList.remove('active');
+        };
+        window.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') modalOverlay.classList.remove('active');
+        });
 
         dropZone.onclick = () => fileInput.click();
 
@@ -45,62 +273,67 @@
 
         async function processPDF(file) {
             status.innerText = "Επεξεργασία...";
-            const arrayBuffer = await file.arrayBuffer();
-            const srcPdf = await PDFLib.PDFDocument.load(arrayBuffer);
-            const pageCount = srcPdf.getPageCount();
+            try {
+                const arrayBuffer = await file.arrayBuffer();
+                const srcPdf = await PDFLib.PDFDocument.load(arrayBuffer);
+                const pageCount = srcPdf.getPageCount();
 
-            // Συναρτήση για δημιουργία PDF από λίστα σελίδων
-            async function createPdfFromIndices(indices, suffix) {
-                const outPdf = await PDFLib.PDFDocument.create();
-                for (const group of indices) {
-                    const newPage = outPdf.addPage([841.89, 595.28]); // A4 Landscape
-                    const { width, height } = newPage.getSize();
-                    
-                    const [p1] = await outPdf.embedPages([srcPdf.getPages()[group[0]]]);
-                    const [p2] = await outPdf.embedPages([srcPdf.getPages()[group[1]]]);
+                // Συναρτήση για δημιουργία PDF από λίστα σελίδων
+                async function createPdfFromIndices(indices, suffix) {
+                    const outPdf = await PDFLib.PDFDocument.create();
+                    for (const group of indices) {
+                        const newPage = outPdf.addPage([841.89, 595.28]); // A4 Landscape
+                        const { width, height } = newPage.getSize();
+                        
+                        const [p1] = await outPdf.embedPages([srcPdf.getPages()[group[0]]]);
+                        const [p2] = await outPdf.embedPages([srcPdf.getPages()[group[1]]]);
 
-                    newPage.drawPage(p1, { x: 0, y: 0, width: width / 2, height: height });
-                    newPage.drawPage(p2, { x: width / 2, y: 0, width: width / 2, height: height });
+                        newPage.drawPage(p1, { x: 0, y: 0, width: width / 2, height: height });
+                        newPage.drawPage(p2, { x: width / 2, y: 0, width: width / 2, height: height });
 
-                    // Διακεκομμένη γραμμή κοπής
-                    newPage.drawLine({
-                        start: { x: width / 2, y: 0 },
-                        end: { x: width / 2, y: height },
-                        thickness: 1,
-                        dashArray: [5, 5],
-                        color: PDFLib.rgb(0.7, 0.7, 0.7),
-                    });
+                        // Διακεκομμένη γραμμή κοπής
+                        newPage.drawLine({
+                            start: { x: width / 2, y: 0 },
+                            end: { x: width / 2, y: height },
+                            thickness: 1,
+                            dashArray: [5, 5],
+                            color: PDFLib.rgb(0.7, 0.7, 0.7),
+                        });
+                    }
+                    const pdfBytes = await outPdf.save();
+                    const blob = new Blob([pdfBytes], { type: "application/pdf" });
+                    const link = document.createElement("a");
+                    link.href = URL.createObjectURL(blob);
+                    link.download = file.name.replace(".pdf", "") + suffix + ".pdf";
+                    link.click();
                 }
-                const pdfBytes = await outPdf.save();
-                const blob = new Blob([pdfBytes], { type: "application/pdf" });
-                const link = document.createElement("a");
-                link.href = URL.createObjectURL(blob);
-                link.download = file.name.replace(".pdf", "") + suffix + ".pdf";
-                link.click();
-            }
 
-            if (pageCount === 1) {
-                // Περίπτωση 1 σελίδας -> 1 αρχείο με τη σελίδα διπλή
-                await createPdfFromIndices([[0, 0]], "_2in1_landscape_SINGLE");
-            } else if (pageCount % 2 === 0) {
-                // Ζυγός αριθμός -> 1 αρχείο με όλα τα ζεύγη
-                let indices = [];
-                for (let i = 0; i < pageCount; i += 2) indices.push([i, i + 1]);
-                await createPdfFromIndices(indices, "_2in1_landscape_FULL");
-            } else {
-                // Περιττός αριθμός (>1) -> ΔΥΟ αρχεία
-                let mainIndices = [];
-                for (let i = 0; i < pageCount - 1; i += 2) mainIndices.push([i, i + 1]);
-                
-                // 1. Το κύριο αρχείο (σελίδες 1 έως προτελευταία)
-                await createPdfFromIndices(mainIndices, "_PART_A_FULL_PAGES");
-                
-                // 2. Το αρχείο της τελευταίας σελίδας (διπλή)
-                const lastIdx = pageCount - 1;
-                await createPdfFromIndices([[lastIdx, lastIdx]], "_PART_B_LAST_PAGE_DOUBLE");
-            }
+                if (pageCount === 1) {
+                    // Περίπτωση 1 σελίδας -> 1 αρχείο με τη σελίδα διπλή
+                    await createPdfFromIndices([[0, 0]], "_2in1_landscape_SINGLE");
+                } else if (pageCount % 2 === 0) {
+                    // Ζυγός αριθμός -> 1 αρχείο με όλα τα ζεύγη
+                    let indices = [];
+                    for (let i = 0; i < pageCount; i += 2) indices.push([i, i + 1]);
+                    await createPdfFromIndices(indices, "_2in1_landscape_FULL");
+                } else {
+                    // Περιττός αριθμός (>1) -> ΔΥΟ αρχεία
+                    let mainIndices = [];
+                    for (let i = 0; i < pageCount - 1; i += 2) mainIndices.push([i, i + 1]);
+                    
+                    // 1. Το κύριο αρχείο (σελίδες 1 έως προτελευταία)
+                    await createPdfFromIndices(mainIndices, "_PART_A_FULL_PAGES");
+                    
+                    // 2. Το αρχείο της τελευταίας σελίδας (διπλή)
+                    const lastIdx = pageCount - 1;
+                    await createPdfFromIndices([[lastIdx, lastIdx]], "_PART_B_LAST_PAGE_DOUBLE");
+                }
 
-            status.innerText = "Η μετατροπή ολοκληρώθηκε!";
+                status.innerText = "Η μετατροπή ολοκληρώθηκε!";
+            } catch (err) {
+                console.error(err);
+                status.innerText = "Σφάλμα κατά την επεξεργασία του αρχείου.";
+            }
         }
     </script>
 </body>
